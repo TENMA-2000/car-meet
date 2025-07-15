@@ -35,7 +35,7 @@ public class UserService {
 		
 		String hashedPassword = passwordEncoder.encode(signupRequestDTO.getPassword()); //TODO hashedPasswordとはどういう意味か？
 		
-		Role userRole = roleRepository.findByRoleName("USER")
+		Role userRole = roleRepository.findByName("USER")
 				.orElseThrow(() -> new RuntimeException("デフォルトの'USER'ロールが見つかりません。データベースを確認してください。"));
 		
 		//TODO 以下でやっていることについて詳しく説明をしてほしい。

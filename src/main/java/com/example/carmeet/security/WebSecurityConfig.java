@@ -31,6 +31,8 @@ public class WebSecurityConfig{
 				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/api/auth/login", "/api/auth/signup").permitAll()
+						.requestMatchers("/api/admin/**").hasRole("ADMIN")
+						.requestMatchers("/api/user/**").hasRole("GENERAL")
 						.anyRequest().authenticated()
 				)
 				.sessionManagement(session -> session

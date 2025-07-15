@@ -8,5 +8,5 @@ import com.example.carmeet.entity.Role;
 
 public interface RoleRepository extends JpaRepository<Role, Integer>{
 
-	Optional<Role> findByRoleName(String roleName);
+	Optional<Role> findByName(String name);
 }
