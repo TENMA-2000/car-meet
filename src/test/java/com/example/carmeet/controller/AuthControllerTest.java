@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
+@Sql(scripts = "/data.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class AuthControllerTest {
 
 	@Autowired
@@ -56,8 +58,14 @@ public class AuthControllerTest {
 		userRepository.save(user);
 	}
 	
+	void debugCheck() {
+	    System.out.println("★ロール一覧: " + roleRepository.findAll());
+	}
+	
 	@Test
 	public void testLoginSuccess() throws Exception {
+		System.out.println("★ testLoginSuccess 実行中");
+		
 		LoginRequestDTO loginRequestDTO = new LoginRequestDTO();
 		loginRequestDTO.setEmail("test@example.com");
 		loginRequestDTO.setPassword("password123");
@@ -69,7 +77,7 @@ public class AuthControllerTest {
 		.andExpect(jsonPath("$.message").value("ログインに成功しました。"))
 		.andExpect(jsonPath("$.token").isNotEmpty())
 		.andExpect(jsonPath("$.userId").isNumber())
-		.andExpect(jsonPath("$.name").value("テストユーザー"));
+		.andExpect(jsonPath("$.userName").value("テストユーザー"));
 	}
 	
 	@Test

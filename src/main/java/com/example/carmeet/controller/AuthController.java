@@ -48,15 +48,22 @@ public class AuthController {
 
 	@PostMapping("/login")
 	public ResponseEntity<AuthResponseDTO> authenticateUser(@RequestBody LoginRequestDTO loginRequestDTO) {
+		System.out.println("DEBUG: AuthController - AuthenticateUser called.");
+		System.out.println("DEBUG: AuthController - Attempting authentication for email: " + loginRequestDTO.getEmail());
+		
 		try {
 			Authentication authentication = authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(
 							loginRequestDTO.getEmail(),
 							loginRequestDTO.getPassword()));
 
+			System.out.println("DEBUG: AuthController - Authentication successful.");
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+			
 			UserDetailsImpl userDetailsImpl = (UserDetailsImpl) authentication.getPrincipal();
 
 			String token = jwtUtil.generateToken(userDetailsImpl);
+			System.out.println("DEBUG: AuthController - JWT generated: " + token);
 
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -68,6 +75,7 @@ public class AuthController {
 
 			return new ResponseEntity<>(authResponseDTO, HttpStatus.OK);
 		} catch (RuntimeException e) {
+			System.out.println("DEBUG: AuthController - Authentication failed: " + e.getMessage());
 			AuthResponseDTO erroAuthResponseDTO = new AuthResponseDTO(e.getMessage(), null, null, null);
 			return new ResponseEntity<>(erroAuthResponseDTO, HttpStatus.UNAUTHORIZED);
 		}

@@ -4,7 +4,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.carmeet.dto.LoginRequestDTO;
 import com.example.carmeet.dto.ProfileUpdateRequestDTO;
 import com.example.carmeet.dto.SignupRequestDTO;
 import com.example.carmeet.entity.Role;
@@ -49,21 +48,21 @@ public class UserService {
 		return userRepository.save(user);
 	}
 	
-	@Transactional(readOnly = true)
-	public User authenticateUser(LoginRequestDTO loginRequestDTO) {
-		User user = userRepository.findByEmail(loginRequestDTO.getEmail())
-				.orElseThrow(() -> new RuntimeException("メールアドレスまたはパスワードが間違っています。"));
+	//@Transactional(readOnly = true)
+	//public User authenticateUser(LoginRequestDTO loginRequestDTO) {
+		//User user = userRepository.findByEmail(loginRequestDTO.getEmail())
+				//.orElseThrow(() -> new RuntimeException("メールアドレスまたはパスワードが間違っています。"));
 		
-		if (!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
-			throw new RuntimeException("メールアドレスまたはパスワードが間違っています。");
-		}
+		//if (!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
+			//throw new RuntimeException("メールアドレスまたはパスワードが間違っています。");
+		//}
 		
-		if (!user.getEnabled()) {
-			throw new RuntimeException("アカウントが無効です。メール認証を完了してください。");
-		}
+		//if (!user.getEnabled()) {
+			//throw new RuntimeException("アカウントが無効です。メール認証を完了してください。");
+		//}
 		
-		return user;
-	}
+		//return user;
+	//}
 	
 	@Transactional
 	public User updateUserProfile(Long userId, ProfileUpdateRequestDTO profileUpdateRequestDTO) {

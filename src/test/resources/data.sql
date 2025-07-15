@@ -2,9 +2,6 @@
 INSERT IGNORE INTO roles (role_id, name) VALUES (1, 'ROLE_GENERAL');
 INSERT IGNORE INTO roles (role_id, name) VALUES (2, 'ROLE_ADMIN');
 
-DELETE FROM users;
-DELETE FROM roles;
-
 /* usersテーブル */
 -- ユーザー1: 一般ユーザー
 INSERT IGNORE INTO users (name, email, password, phone_number, profile_image, car_life_year, gender, introduction, hobbies, enabled, role_id) VALUES ('山田太郎', 'taro.yamada@example.com', 'password123', '09012345678', 'https://example.com/profile/taro.jpg', 5, 0, 'ドライブと洗車が趣味です。', 'ドライブ,洗車,写真', TRUE, 1);
