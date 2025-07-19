@@ -14,46 +14,45 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig{
+public class WebSecurityConfig {
 
 	private final UserDetailsServiceImpl userDetailsServiceImpl;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
-	
-	public WebSecurityConfig(UserDetailsServiceImpl userDetailsServiceImpl, JwtAuthenticationFilter jwtAuthenticationFilter) {
+
+	public WebSecurityConfig(UserDetailsServiceImpl userDetailsServiceImpl,
+			JwtAuthenticationFilter jwtAuthenticationFilter) {
 		this.userDetailsServiceImpl = userDetailsServiceImpl;
 		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
 	}
-	
+
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
+	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity
 				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/api/auth/login", "/api/auth/signup").permitAll()
 						.requestMatchers("/api/admin/**").hasRole("ADMIN")
 						.requestMatchers("/api/user/**").hasRole("GENERAL")
-						.anyRequest().authenticated()
-				)
+						.anyRequest().authenticated())
+				.exceptionHandling(exception -> exception
+						.authenticationEntryPoint((request, response, authException) -> {
+							response.sendError(401, "未認証のアクセスです");
+						}))
 				.sessionManagement(session -> session
-						.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-						)
+						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.userDetailsService(userDetailsServiceImpl)
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 		return httpSecurity.build();
 	}
-	
-	//@Bean
-	//public UserDetailsService userDetailsService() {
-		//return userDetailsServiceImpl;
-	//}
-	
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
+
 	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception{
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+			throws Exception {
 		return authenticationConfiguration.getAuthenticationManager();
 	}
 }
