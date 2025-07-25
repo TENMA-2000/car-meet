@@ -22,20 +22,20 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS posts (
-	post_id INT AUTO_INCREMENT PRIMARY KEY,
+	post_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	user_id INT NOT NULL,
 	caption TEXT,
 	media_url VARCHAR(255),
 	media_type VARCHAR(50),
-	is_story BOOLEAN,
+	is_story BOOLEAN NOT NULL,
 	expires_at DATETIME,
-	created_at DATETIME,
-	updated_at DATETIME,
+	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	deleted_at DATETIME,
-	view_count INT DEFAULT 0,
-	like_count INT DEFAULT 0,
+	view_count INT NOT NULL DEFAULT 0,
+	like_count INT NOT NULL DEFAULT 0,
 	location_name VARCHAR(255),
 	latitude DOUBLE,
 	longitude DOUBLE,
-	FOREIGN KEY (user_id) REFERENCES user(user_id)
+	FOREIGN KEY (user_id) REFERENCES users(user_id)
 );

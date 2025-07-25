@@ -28,6 +28,7 @@ public class UserController {
 	
 	@GetMapping("/me")
 	public ResponseEntity<ProfileResponseDTO> getMyProfile(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl){
+		
 		User user = userDetailsImpl.getUser();
 		ProfileResponseDTO profileResponseDTO = new ProfileResponseDTO(user.getUserId(), user.getName(), user.getEmail());
 		return ResponseEntity.ok(profileResponseDTO);
