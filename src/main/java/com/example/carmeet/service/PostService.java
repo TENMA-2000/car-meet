@@ -175,5 +175,16 @@ public class PostService {
 		
 		return postRepository.findAll(pageable).map(this::mapToResponse);
 	}
+	
+	public Page<PostResponseDTO> searchPosts(String keyword, int page, int size){
+		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+		
+		if (keyword == null || keyword.trim().isEmpty()) {
+			return postRepository.findAll(pageable).map(this::mapToResponse);
+		}
+		
+		return postRepository.findByCaptionContainingIgnoreCase(keyword, pageable)
+				.map(this::mapToResponse);
+	}
 
 }

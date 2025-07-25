@@ -29,8 +29,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-
-
 @Slf4j
 @RestController
 @RequestMapping("/api/posts")
@@ -38,21 +36,20 @@ import lombok.extern.slf4j.Slf4j;
 public class PostController {
 
 	private final PostService postService;
-	
+
 	@GetMapping("/{postId}")
-	public ResponseEntity<PostResponseDTO> getPost(@PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+	public ResponseEntity<PostResponseDTO> getPost(@PathVariable Long postId,
+			@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
 		User user = userDetailsImpl.getUser();
 		PostResponseDTO postResponseDTO = postService.getPost(postId, user);
 		return ResponseEntity.ok(postResponseDTO);
 	}
-	
+
 	@GetMapping
-	public ResponseEntity<List<PostResponseDTO>> getAllPosts(){
+	public ResponseEntity<List<PostResponseDTO>> getAllPosts() {
 		List<PostResponseDTO> posts = postService.getAllPosts();
 		return ResponseEntity.ok(posts);
 	}
-	
-	
 
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<PostResponseDTO> createPost(
@@ -67,8 +64,9 @@ public class PostController {
 
 	@PutMapping("/{postId}")
 	public ResponseEntity<PostResponseDTO> updatePost(@PathVariable Long postId,
-			@Valid @RequestBody PostRequestDTO postRequestDTO, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-		
+			@Valid @RequestBody PostRequestDTO postRequestDTO,
+			@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+
 		User user = userDetailsImpl.getUser();
 		PostResponseDTO postResponseDTO = postService.updatePost(postId, postRequestDTO, user);
 
@@ -76,20 +74,28 @@ public class PostController {
 	}
 
 	@DeleteMapping("/{postId}")
-	public ResponseEntity<Void> deletePost(@PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+	public ResponseEntity<Void> deletePost(@PathVariable Long postId,
+			@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
 		User user = userDetailsImpl.getUser();
 		postService.deletePost(postId, user);
 		return ResponseEntity.noContent().build();
 	}
-	
+
 	@GetMapping("/sorted")
 	public ResponseEntity<Page<PostResponseDTO>> getSortedPosts(@RequestParam(defaultValue = "createdAt") String sortBy,
-			@RequestParam(defaultValue = "desc")String direction,
+			@RequestParam(defaultValue = "desc") String direction,
 			@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size) {
-		
+
 		return ResponseEntity.ok(postService.getSortedPosts(sortBy, direction, page, size));
 	}
-	
+
+	@GetMapping("/search")
+	public ResponseEntity<Page<PostResponseDTO>> searchPosts(
+			@RequestParam String keyword,
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size) {
+		return ResponseEntity.ok(postService.searchPosts(keyword, page, size));
+	}
 
 }
