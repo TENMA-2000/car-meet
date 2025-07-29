@@ -18,50 +18,41 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Configuration
 @EnableWebSecurity
+@Slf4j
+@RequiredArgsConstructor
 public class WebSecurityConfig {
 
-	private final UserDetailsServiceImpl userDetailsServiceImpl;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
-	public WebSecurityConfig(UserDetailsServiceImpl userDetailsServiceImpl,
-			JwtAuthenticationFilter jwtAuthenticationFilter) {
-		this.userDetailsServiceImpl = userDetailsServiceImpl;
-		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-	}
-
-	@Bean
-	public CorsConfigurationSource configurationSource() {
-		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowedOrigins(List.of("http://127.0.0.1:5500"));
-		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-		config.setAllowedHeaders(List.of("*"));
-		config.setAllowCredentials(true);
-
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", config);
-		return source;
-	}
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+		log.info("【Security設定開始】SecurityFilterChainの構築を開始します");
+		
 		httpSecurity
 				.cors(Customizer.withDefaults())
 				.csrf(csrf -> csrf.disable())
-				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/api/auth/login", "/api/auth/signup").permitAll()
-						.requestMatchers("/api/admin/**").hasRole("ADMIN")
-						.requestMatchers("/api/user/**").hasRole("GENERAL")
-						.anyRequest().authenticated())
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.exceptionHandling(exception -> exception
 						.authenticationEntryPoint((request, response, authException) -> {
-							response.sendError(401, "未認証のアクセスです");
+							log.warn("【認証エラー】未認証アクセス: {}", request.getRequestURI());
+							response.sendError(401);
 						}))
-				.sessionManagement(session -> session
-						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.userDetailsService(userDetailsServiceImpl)
+				.authorizeHttpRequests(auth -> auth
+						.requestMatchers("/api/auth/login", "/api/auth/signup").permitAll()
+						.requestMatchers("/api/users/me").authenticated()
+						.requestMatchers("/api/admin/**").hasRole("ADMIN")
+						.requestMatchers("/api/user/**").hasRole("GENERAL")
+						.anyRequest().authenticated()
+				)
+				
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+		log.info("【Security設定完了】SecurityFilterChainの構築が完了しました");
+		
 		return httpSecurity.build();
 	}
 
@@ -73,6 +64,21 @@ public class WebSecurityConfig {
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
 			throws Exception {
+		log.info("【Security設定】AuthenticationManagerを初期化");
 		return authenticationConfiguration.getAuthenticationManager();
+	}
+	
+
+	@Bean
+	public CorsConfigurationSource configurationSource() {
+		CorsConfiguration corsConfiguration = new CorsConfiguration();
+		corsConfiguration.setAllowedOrigins(List.of("http://127.0.0.1:5500"));
+		corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		corsConfiguration.setAllowedHeaders(List.of("*"));
+		corsConfiguration.setAllowCredentials(true);
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", corsConfiguration);
+		return source;
 	}
 }

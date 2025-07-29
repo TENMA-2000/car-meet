@@ -1,5 +1,7 @@
 package com.example.carmeet.security;
 
+import java.util.Optional;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -8,30 +10,30 @@ import org.springframework.stereotype.Service;
 import com.example.carmeet.entity.User;
 import com.example.carmeet.repository.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService{
 
 	private final UserRepository userRepository;
 	
-	public UserDetailsServiceImpl(UserRepository userRepository) {
-		this.userRepository = userRepository;
-	}
-	
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException{
-		User user = userRepository.findByEmail(email)
-				.orElseThrow(() -> {
-					System.out.println("DEBUG: UserDetailsService - User not found for email: " + email);
-				return new UsernameNotFoundException("ユーザーが見つかりませんでした: " + email);
-				});
+		log.debug("【認証処理開始】入力されたメールアドレス: {}", email);
 		
-		System.out.println("DEBUG: UserDetailsService - User found: " + user.getEmail());
-        System.out.println("DEBUG: UserDetailsService - Stored hashed password: " + user.getPassword());
-        System.out.println("DEBUG: UserDetailsService - User enabled status: " + user.getEnabled());
-        System.out.println("DEBUG: UserDetailsService - User role: " + user.getRole().getName());
         
-        UserDetailsImpl userDetailsImpl = new UserDetailsImpl(user);
-        System.out.println("DEBUG: UserDetailsService - UserDetailsImpl created. Password from UserDetailsImpl: " + userDetailsImpl.getPassword());
-		return new UserDetailsImpl(user);
+        Optional<User> user = userRepository.findByEmail(email);
+        
+        if (user.isEmpty()) {
+			log.warn("【認証失敗】メールアドレス '{}' に一致するユーザーが存在しません。", email);
+			throw new UsernameNotFoundException("");
+		}
+        
+        log.debug("【認証成功】ユーザー '{}' をロードしました。", user.get().getEmail());
+        
+        return new UserDetailsImpl(user.get());
 	}
 }

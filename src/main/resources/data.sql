@@ -4,19 +4,19 @@ INSERT IGNORE INTO roles (role_id, name) VALUES (2, 'ROLE_ADMIN');
 
 /* usersテーブル */
 -- ユーザー1: 一般ユーザー
-INSERT IGNORE INTO users (name, email, password, phone_number, profile_image, car_life_year, gender, introduction, hobbies, enabled, role_id) VALUES ('山田太郎', 'taro.yamada@example.com', '$2a$12$S7iHdT4OCEloMkQ6Sshff.nW7iMn6aexz0FlkPfNoo/vZKFXFzpoe', '09012345678', '/images/taroyamada.png', 5, 0, 'ドライブと車いじりが趣味です！よろしくお願いいたします！', 'ドライブ,車いじり,写真', TRUE, 1);
+INSERT IGNORE INTO users (name, email, password, phone_number, profile_image, car_life_year, gender, introduction, hobbies, enabled, role_id) VALUES ('山田太郎', 'taro.yamada@example.com', '$2a$12$FsEqd.UzxiNsmYzpTneFH.eCpmT3PRwrIdnTdFr02czyHmDYOhaba', '09012345678', '/images/taroyamada.png', 5, 0, 'ドライブと車いじりが趣味です！よろしくお願いいたします！', 'ドライブ,車いじり,写真', TRUE, 1);
 
 -- ユーザー2: 管理者ユーザー
-INSERT IGNORE INTO users (name, email, password, phone_number, profile_image, car_life_year, gender, introduction, hobbies, enabled, role_id) VALUES ('佐藤花子', 'hanako.sato@example.com', '$2a$12$2M8BpPeVsmEcMz1DiOOS9eLkhkU/yZdFhGQ1XNm3Rx0nZgbgcyqIW', '08098765432', 'https://example.com/profile/hanako.png', 10, 1, '車のイベント企画が好きです。', 'イベント企画,カフェ巡り', TRUE, 2);
+INSERT IGNORE INTO users (name, email, password, phone_number, profile_image, car_life_year, gender, introduction, hobbies, enabled, role_id) VALUES ('佐藤花子', 'hanako.sato@example.com', '$2a$12$3CKdryHarg2qcdRfhRVB3e7ism6YEJXRJxVufVCCNYyUqthpt9k5K', '08098765432', 'https://example.com/profile/hanako.png', 10, 1, '車のイベント企画が好きです。', 'イベント企画,カフェ巡り', TRUE, 2);
 
 -- ユーザー3: 
-INSERT IGNORE INTO users (name, email, password, phone_number, profile_image, car_life_year, gender, introduction, hobbies, enabled, role_id) VALUES ('田中一郎', 'ichiro.tanaka@example.com', '$2a$10$gNEZcQwUT3sRFEgHL8JKVex2s0aFk0OfRbGswH1zxzEyO2DuXPBlS', '09012345678', '/images/itiroyamada.png', 12, 0, '週末は愛車でドライブに出かけるのが楽しみです。同じVIPカー乗り同士での楽しく交流をしたいと思ってます！', 'ドライブ,洗車,ラジコンカー」', TRUE, 1);
+INSERT IGNORE INTO users (name, email, password, phone_number, profile_image, car_life_year, gender, introduction, hobbies, enabled, role_id) VALUES ('田中一郎', 'ichiro.tanaka@example.com', '$2a$12$XsIZujxAubF4zDANItKASuXp5gIXJt6FbuMDsBFesIsz8N5oH7122', '09012345678', '/images/itiroyamada.png', 12, 0, '週末は愛車でドライブに出かけるのが楽しみです。同じVIPカー乗り同士での楽しく交流をしたいと思ってます！', 'ドライブ,洗車,ラジコンカー」', TRUE, 1);
 
 -- ユーザー4:
 INSERT IGNORE INTO users (name, email, password, phone_number, enabled, role_id) VALUES ('鈴木次郎', 'jiro.suzuki@example.com', 'suzukiabc', NULL, FALSE, 1);
 
 -- ユーザー5:
-INSERT IGNORE INTO users (name, email, password, phone_number, profile_image, car_life_year, gender, introduction, hobbies, enabled, role_id) VALUES ('佐藤美智子', 'michiko.sato@example.com', '$2a$10$3EcsYpjcH3aOGfHFLP5nF.5YxRZTJ23E4d6Ztv6w3Awf3rK3UdwH2', '08023456789', '/images/users/michiko.jpg',  8,  1,  '車は日常の相棒。のんびりと景色を楽しむドライブが大好きです。',  'カフェ巡り、ドライブ、写真撮影、料理',  TRUE,  1);
+INSERT IGNORE INTO users (name, email, password, phone_number, profile_image, car_life_year, gender, introduction, hobbies, enabled, role_id) VALUES ('佐藤美智子', 'michiko.sato@example.com', '$2a$12$Yvf/xvLo9i26XUbzPeFuvu5gvWq3zA8hV6RjOftmmYfBg10DZqC7C', '08023456789', '/images/users/michiko.jpg',  8,  1,  '車は日常の相棒。のんびりと景色を楽しむドライブが大好きです。',  'カフェ巡り、ドライブ、写真撮影、料理',  TRUE,  1);
 
 /* postsテーブル */
 INSERT INTO posts (

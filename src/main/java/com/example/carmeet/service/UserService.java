@@ -1,8 +1,16 @@
 package com.example.carmeet.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.UUID;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.carmeet.dto.ProfileUpdateRequestDTO;
 import com.example.carmeet.dto.SignupRequestDTO;
@@ -11,33 +19,34 @@ import com.example.carmeet.entity.User;
 import com.example.carmeet.repository.RoleRepository;
 import com.example.carmeet.repository.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class UserService {
 
 	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
 	private final PasswordEncoder passwordEncoder;
 	
-	public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
-		this.userRepository = userRepository;
-		this.roleRepository = roleRepository;
-		this.passwordEncoder = passwordEncoder;
-	}
-	
 	@Transactional
 	public User signupUser(SignupRequestDTO signupRequestDTO) {
 		if (userRepository.findByEmail(signupRequestDTO.getEmail()).isPresent()) {
-			throw new RuntimeException("このメールアドレスは既に登録されています。"); //TODO RuntimeExceptionの意味と
+			throw new IllegalStateException();
 		}
 		
-		String hashedPassword = passwordEncoder.encode(signupRequestDTO.getPassword()); //TODO hashedPasswordとはどういう意味か？
+		Role userRole = roleRepository.findByName("ROLE_GENERAL")
+				.orElseThrow(IllegalStateException::new);
 		
-		Role userRole = roleRepository.findByName("USER")
-				.orElseThrow(() -> new RuntimeException("デフォルトの'USER'ロールが見つかりません。データベースを確認してください。"));
+		String rawPassword = signupRequestDTO.getPassword();
+		String hashedPassword = passwordEncoder.encode(rawPassword);
+		log.info("登録時の平文パスワード: '{}'", rawPassword);
+		log.info("登録時のハッシュ: {}", hashedPassword);
 		
-		//TODO 以下でやっていることについて詳しく説明をしてほしい。
 		User user = new User(); 
 		user.setName(signupRequestDTO.getName());
 		user.setEmail(signupRequestDTO.getEmail());
@@ -48,31 +57,48 @@ public class UserService {
 		return userRepository.save(user);
 	}
 	
-	//@Transactional(readOnly = true)
-	//public User authenticateUser(LoginRequestDTO loginRequestDTO) {
-		//User user = userRepository.findByEmail(loginRequestDTO.getEmail())
-				//.orElseThrow(() -> new RuntimeException("メールアドレスまたはパスワードが間違っています。"));
-		
-		//if (!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
-			//throw new RuntimeException("メールアドレスまたはパスワードが間違っています。");
-		//}
-		
-		//if (!user.getEnabled()) {
-			//throw new RuntimeException("アカウントが無効です。メール認証を完了してください。");
-		//}
-		
-		//return user;
-	//}
-	
 	@Transactional
 	public User updateUserProfile(Long userId, ProfileUpdateRequestDTO profileUpdateRequestDTO) {
 		User user = userRepository.findById(userId)
-				.orElseThrow(() -> new RuntimeException("ユーザーが見つかりませんでした。"));
+				.orElseThrow(IllegalStateException::new);
 		
 		if (profileUpdateRequestDTO.getName() != null && !profileUpdateRequestDTO.getName().isBlank()) {
 			user.setName(profileUpdateRequestDTO.getName());
 		}
 		
+		if (profileUpdateRequestDTO.getCarLifeYear() != null) {
+			user.setCarLifeYear(profileUpdateRequestDTO.getCarLifeYear());
+		}
+		
+		if (profileUpdateRequestDTO.getGender() != null) {
+			user.setGender(profileUpdateRequestDTO.getGender());
+		}
+		
+		if (profileUpdateRequestDTO.getHobbies() != null) {
+			user.setHobbies(profileUpdateRequestDTO.getHobbies());
+		}
+		
+		if (profileUpdateRequestDTO.getIntroduction() != null) {
+			user.setIntroduction(profileUpdateRequestDTO.getIntroduction());
+		}
+		
+		if (profileUpdateRequestDTO.getProfileImage() != null && !profileUpdateRequestDTO.getProfileImage().isEmpty()) {
+			String filename = saveProfileImage(profileUpdateRequestDTO.getProfileImage());
+			user.setProfileImage(filename);
+		}
+		
 		return userRepository.save(user);
+	}
+	
+	private String saveProfileImage(MultipartFile multipartFile) {
+		try {
+			String fileName = UUID.randomUUID() + "_" + multipartFile.getOriginalFilename();
+			Path path = Paths.get("src/main/resources/static/images", fileName);
+		
+			Files.copy(multipartFile.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+			return "/images/" + fileName;
+		} catch (IOException e) {
+			throw new  RuntimeException(e);
+		}
 	}
 }

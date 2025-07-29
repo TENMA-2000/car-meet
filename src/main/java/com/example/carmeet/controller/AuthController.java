@@ -19,65 +19,50 @@ import com.example.carmeet.security.JwtUtil;
 import com.example.carmeet.security.UserDetailsImpl;
 import com.example.carmeet.service.UserService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-	private final UserService authService;
+	private final UserService userService;
 	private final JwtUtil jwtUtil;
 	private final AuthenticationManager authenticationManager;
 
 	public AuthController(UserService authService, JwtUtil jwtUtil, AuthenticationManager authenticationManager) {
-		this.authService = authService;
+		this.userService = authService;
 		this.jwtUtil = jwtUtil;
 		this.authenticationManager = authenticationManager;
 	}
 
 	@PostMapping("/signup")
 	public ResponseEntity<AuthResponseDTO> signupUser(@RequestBody SignupRequestDTO signupRequestDTO) {
-		try {
-			User signupUser = authService.signupUser(signupRequestDTO);
-			AuthResponseDTO authResponseDTO = new AuthResponseDTO("ユーザー登録が完了しました。", null, signupUser.getUserId(),
-					signupUser.getName());
-			return new ResponseEntity<>(authResponseDTO, HttpStatus.CREATED);
-		} catch (RuntimeException e) {
-			AuthResponseDTO errorResponseDTO = new AuthResponseDTO(e.getMessage(), null, null, null);
-			return new ResponseEntity<>(errorResponseDTO, HttpStatus.BAD_REQUEST);
-		}
+		User user = userService.signupUser(signupRequestDTO);
+		UserDetailsImpl userDetailsImpl = new UserDetailsImpl(user);
+
+		String token = jwtUtil.generateToken(userDetailsImpl);
+		return new ResponseEntity<>(new AuthResponseDTO(token, user.getUserId()), HttpStatus.CREATED);
 	}
 
 	@PostMapping("/login")
 	public ResponseEntity<AuthResponseDTO> authenticateUser(@RequestBody LoginRequestDTO loginRequestDTO) {
-		System.out.println("DEBUG: AuthController - AuthenticateUser called.");
-		System.out.println("DEBUG: AuthController - Attempting authentication for email: " + loginRequestDTO.getEmail());
-		
+		log.info("Authenticating user with email: {}", loginRequestDTO.getEmail());
+
 		try {
 			Authentication authentication = authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(
-							loginRequestDTO.getEmail(),
-							loginRequestDTO.getPassword()));
-
-			System.out.println("DEBUG: AuthController - Authentication successful.");
+					new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmail(), loginRequestDTO.getPassword()));
+			
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 			
 			UserDetailsImpl userDetailsImpl = (UserDetailsImpl) authentication.getPrincipal();
-
 			String token = jwtUtil.generateToken(userDetailsImpl);
-			System.out.println("DEBUG: AuthController - JWT generated: " + token);
-
-			SecurityContextHolder.getContext().setAuthentication(authentication);
-
-			AuthResponseDTO authResponseDTO = new AuthResponseDTO(
-					"ログインに成功しました。",
-					token,
-					userDetailsImpl.getUser().getUserId(),
-					userDetailsImpl.getUser().getName());
-
-			return new ResponseEntity<>(authResponseDTO, HttpStatus.OK);
-		} catch (RuntimeException e) {
-			System.out.println("DEBUG: AuthController - Authentication failed: " + e.getMessage());
-			AuthResponseDTO erroAuthResponseDTO = new AuthResponseDTO(e.getMessage(), null, null, null);
-			return new ResponseEntity<>(erroAuthResponseDTO, HttpStatus.UNAUTHORIZED);
+			
+			return new ResponseEntity<>(new AuthResponseDTO(token, userDetailsImpl.getUser().getUserId()), HttpStatus.OK);
+			
+		} catch (Exception e) {
+			log.error("認証に失敗しました。", e);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
 	}
 }

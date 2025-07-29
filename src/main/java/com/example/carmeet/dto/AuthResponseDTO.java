@@ -10,10 +10,8 @@ public class AuthResponseDTO {
 	private Long userId;
 	private String userName;
 	
-	public AuthResponseDTO(String message, String token, Long userId, String userName) {
-		this.message = message;
+	public AuthResponseDTO(String token, Long userId) {
 		this.token = token;
 		this.userId = userId;
-		this.userName = userName;
 	}
 }
