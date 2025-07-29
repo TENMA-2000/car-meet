@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <title>プロフィール編集</title>
+        <link rel="stylesheet" href="../css/profile.css">
+    </head>
+    <body>
+        <div class="container">
+            <h2>プロフィールを編集</h2>
+
+            <form id="edit-profile-form" enctype="multipart/form-data">
+                <label>名前</label>
+                <input type="text" id="name" name="name" required />
+
+                <label>メールアドレス</label>
+                <input type="email" id="email" name="email" readonly />
+
+                <label>カーライフ歴（年）</label>
+                <input type="number" id="carLifeYear" name="carLifeYear" min="0" />
+
+                <label>性別</label>
+                <select name="gender" id="gender">
+                    <option value="">選択してください</option>
+                    <option value="0">男性</option>
+                    <option value="1">女性</option>
+                    <option value="2">その他</option>
+                </select>
+
+                <label>趣味</label>
+                <input type="text" id="hobbies" name="hobbies" />
+
+                <label>自己紹介</label>
+                <textarea name="introduction" id="introduction" rows="3"></textarea>
+
+                <label>プロフィール画像</label>
+                <input type="file" id="profileImage" name="profileImage" accept="image/*" />
+
+                <button type="submit">保存する</button>
+            </form>
+
+            <p id="message"></p>
+        </div>
+
+        <script src="../js/edit-profile.js"></script>
+    </body>
+</html>

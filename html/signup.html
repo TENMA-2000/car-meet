@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>新規会員登録</title>
+    <link rel="stylesheet" href="../css/signup.css">
+</head>
+
+<body>
+    <div class="container">
+        <h2>新規会員登録</h2>
+        <form id="signup" enctype="multipart/form-data">
+            <input type="text" name="name" placeholder="名前" required />
+            <input type="email" name="email" placeholder="メールアドレス" required />
+            <input type="password" name="password" placeholder="パスワード（8文字以上）" required minlength="8" />
+            <button type="submit">登録する</button>
+        </form>
+    </div>
+    <script src="../js/signup.js"></script>
+</body>
+
+</html>
