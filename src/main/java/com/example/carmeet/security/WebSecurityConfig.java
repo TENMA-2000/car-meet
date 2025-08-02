@@ -43,7 +43,7 @@ public class WebSecurityConfig {
 							response.sendError(401);
 						}))
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/api/auth/login", "/api/auth/signup").permitAll()
+						.requestMatchers("/api/auth/**", "/api/auth/login", "/api/auth/signup", "/api/posts").permitAll()
 						.requestMatchers("/api/users/me").authenticated()
 						.requestMatchers("/api/admin/**").hasRole("ADMIN")
 						.requestMatchers("/api/user/**").hasRole("GENERAL")

@@ -46,9 +46,9 @@ public class PostController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<PostResponseDTO>> getAllPosts() {
-		List<PostResponseDTO> posts = postService.getAllPosts();
-		return ResponseEntity.ok(posts);
+	public ResponseEntity<List<PostResponseDTO>> getLimitedPosts(
+			@RequestParam(defaultValue = "10") int limit) {
+		return ResponseEntity.ok(postService.getLimitedPosts(limit));
 	}
 
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

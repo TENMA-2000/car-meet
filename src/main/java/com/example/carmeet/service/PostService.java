@@ -64,10 +64,11 @@ public class PostService {
 		return postResponseDTO;
 	}
 
-	public List<PostResponseDTO> getAllPosts() {
-		List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc();
+	public List<PostResponseDTO> getLimitedPosts(int limit) {
+		Pageable pageable = PageRequest.of(0, limit, Sort.by("createdAt").descending());
 
-		return posts.stream()
+		return postRepository.findAll(pageable)
+				.stream()
 				.map(this::mapToResponse)
 				.collect(Collectors.toList());
 	}

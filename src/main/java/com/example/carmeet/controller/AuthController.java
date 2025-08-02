@@ -58,6 +58,9 @@ public class AuthController {
 			UserDetailsImpl userDetailsImpl = (UserDetailsImpl) authentication.getPrincipal();
 			String token = jwtUtil.generateToken(userDetailsImpl);
 			
+			log.info("認証成功： userId={}, Email={}", userDetailsImpl.getUser().getUserId(), userDetailsImpl.getUsername());
+			log.info("生成されたトークン： {}", token);			
+			
 			return new ResponseEntity<>(new AuthResponseDTO(token, userDetailsImpl.getUser().getUserId()), HttpStatus.OK);
 			
 		} catch (Exception e) {

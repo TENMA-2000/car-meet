@@ -15,7 +15,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -41,9 +43,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			HttpServletResponse httpServletResponse,
 			FilterChain filterChain)
 			throws ServletException, IOException {
+		log.info("【JWTフィルター】リクエストURI： {}", httpServletRequest.getRequestURI());
+		
 		String authHeader = httpServletRequest.getHeader("Authorization");
 
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			log.info("【JWTフィルター】Authorizationヘッダーなし or Bearer形式でないためスキップ");
 			filterChain.doFilter(httpServletRequest, httpServletResponse);
 			return;
 		}
@@ -51,17 +56,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		String token = authHeader.substring(7);
 
 		String username = jwtUtil.extractUsername(token);
+		
+		log.info("【JWTフィルター】抽出したユーザー名： {}", username);
+		
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 			UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);
 
 			if (jwtUtil.isTokenValid(token, (UserDetailsImpl) userDetails)) {
+				log.info("【JWTフィルター】トークン検証成功 → SecurityContextに認証情報をセット");
 				UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
 						userDetails, null, userDetails.getAuthorities());
 				usernamePasswordAuthenticationToken
 						.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
 
 				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-			}
+			}else {
+	            log.warn("【JWTフィルター】トークン検証失敗");
+	        }
 		}
 
 		filterChain.doFilter(httpServletRequest, httpServletResponse);
