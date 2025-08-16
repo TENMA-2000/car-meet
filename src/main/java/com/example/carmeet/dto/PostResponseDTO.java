@@ -20,6 +20,7 @@ public class PostResponseDTO {
 	private String locationName;
 	private Double latitude;
 	private Double longitude;
+	private String profileImage;
 	
 	private Long userId;
 	private String userName;

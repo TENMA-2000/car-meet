@@ -23,7 +23,6 @@ import com.example.carmeet.dto.PostResponseDTO;
 import com.example.carmeet.entity.Post;
 import com.example.carmeet.entity.User;
 import com.example.carmeet.exception.PostNotFoundException;
-import com.example.carmeet.exception.UnauthorizedPostAccessException;
 import com.example.carmeet.repository.PostRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -38,10 +37,6 @@ public class PostService {
 	public PostResponseDTO getPost(Long postId, User user) {
 		Post post = postRepository.findById(postId)
 				.orElseThrow(PostNotFoundException::new);
-
-		if (!post.getUser().getUserId().equals(user.getUserId())) {
-			throw new UnauthorizedPostAccessException();
-		}
 
 		PostResponseDTO postResponseDTO = new PostResponseDTO();
 		postResponseDTO.setPostId(post.getPostId());
@@ -60,6 +55,7 @@ public class PostService {
 
 		postResponseDTO.setUserId(post.getUser().getUserId());
 		postResponseDTO.setUserName(post.getUser().getName());
+		postResponseDTO.setProfileImage(post.getUser().getProfileImage());
 
 		return postResponseDTO;
 	}
@@ -166,6 +162,7 @@ public class PostService {
 		postResponseDTO.setLongitude(post.getLongitude());
 		postResponseDTO.setUserId(post.getUser().getUserId());
 		postResponseDTO.setUserName(post.getUser().getName());
+		postResponseDTO.setProfileImage(post.getUser().getProfileImage());
 
 		return postResponseDTO;
 	}
