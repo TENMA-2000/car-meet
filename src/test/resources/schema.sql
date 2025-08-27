@@ -39,3 +39,13 @@ CREATE TABLE IF NOT EXISTS posts (
 	longitude DOUBLE,
 	FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
+
+CREATE TABLE IF NOT EXISTS likes (
+	like_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	post_id INT NOT NULL,
+	user_id INT NOT NULL,
+	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	UNIQUE KEY (user_id, post_id),
+	FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
+	FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);

@@ -2,6 +2,8 @@ package com.example.carmeet.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -31,7 +33,8 @@ public class Like {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 	
-	@Column(name = "created_at", nullable = false)
+	@Column(name = "created_at", nullable = false, updatable = false)
+	@CreationTimestamp
 	private LocalDateTime createdAt;
 	
 }
