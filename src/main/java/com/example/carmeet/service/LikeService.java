@@ -36,6 +36,7 @@ public class LikeService {
 		
 		return savedLike;
 	}
+
 	
 	@Transactional
 	public boolean deleteLike (Post post, User user) {

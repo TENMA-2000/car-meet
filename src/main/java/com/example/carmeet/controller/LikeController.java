@@ -24,6 +24,7 @@ public class LikeController {
 
 	private final LikeService likeService;
 	
+	
 	@PostMapping("/{postId}/{userId}")
 	public ResponseEntity<Boolean> addLike(@PathVariable Long postId, @PathVariable Long userId) {
 		log.debug("addLikeリクエスト受信 postId=" + postId + ", userId=" + userId);
