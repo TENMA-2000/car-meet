@@ -19,7 +19,7 @@ INSERT IGNORE INTO users (name, email, password, phone_number, enabled, role_id)
 INSERT IGNORE INTO users (name, email, password, phone_number, profile_image, car_life_year, gender, introduction, hobbies, enabled, role_id) VALUES ('佐藤美智子', 'michiko.sato@example.com', '$2a$12$Yvf/xvLo9i26XUbzPeFuvu5gvWq3zA8hV6RjOftmmYfBg10DZqC7C', '08023456789', '/images/mitikosato.png',  8,  1,  '車は日常の相棒。のんびりと景色を楽しむドライブが大好きです。',  'カフェ巡り、ドライブ、写真撮影、料理',  TRUE,  1);
 
 /* postsテーブル */
-INSERT INTO posts (
+INSERT IGNORE INTO posts (
   user_id, caption, media_url, media_type, is_story, expires_at, created_at, updated_at, deleted_at, view_count, like_count, location_name, latitude, longitude
 ) VALUES
 (1, '今日はお気に入りの峠を軽く流してきた。夕方の空気が気持ちよかった。', '/images/photo1.jpg', 'image', false, NULL, '2025-07-06 22:57:48', '2025-07-07 06:57:48', NULL, 183, 1, '峠道', 35.169, 136.906),
@@ -44,7 +44,7 @@ INSERT INTO posts (
 (5, '紅葉を身に行きつけの山へ！真っ赤な紅葉がきれいだった。', '/images/photo20.jpg', 'image', false, NULL, '2025-07-09 22:57:48', '2025-07-09 23:57:48', NULL, 47, 38, '山道の展望台', 35.185, 136.899);
 
 /* comments テーブル */
-INSERT INTO comments (post_id, user_id, parent_comment_id, content, created_at, updated_at, deleted_at)
+INSERT IGNORE INTO comments (post_id, user_id, parent_comment_id, content, created_at, updated_at, deleted_at)
 VALUES
 -- 投稿1
 (1, 2, NULL, 'この投稿めちゃくちゃいいですね！', '2025-08-25 12:00:00', '2025-08-25 12:00:00', NULL),
