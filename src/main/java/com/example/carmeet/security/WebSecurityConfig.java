@@ -46,7 +46,7 @@ public class WebSecurityConfig {
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers(HttpMethod.GET, "/api/posts/**").authenticated()
 						.requestMatchers("/error").permitAll()
-						.requestMatchers("/api/auth/**", "/api/auth/login", "/api/auth/signup", "/api/posts").permitAll()
+						.requestMatchers("/api/auth/**", "/api/auth/login", "/api/auth/signup", "/api/posts/**").permitAll()
 						.requestMatchers("/api/users/me").authenticated()
 						.requestMatchers("/api/admin/**").hasRole("ADMIN")
 						.requestMatchers("/api/user/**").hasRole("GENERAL")

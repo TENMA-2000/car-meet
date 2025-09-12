@@ -1,6 +1,7 @@
 package com.example.carmeet.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.Data;
 
@@ -24,5 +25,5 @@ public class PostResponseDTO {
 	
 	private Long userId;
 	private String userName;
-	
+	private List<CommentResponse> comments;
 }
