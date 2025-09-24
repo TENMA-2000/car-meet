@@ -2,8 +2,6 @@ package com.example.carmeet.dto;
 
 import java.time.LocalDateTime;
 
-import com.example.carmeet.entity.Comment;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,13 +9,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentResponse {
+public class TalkRoomResponse {
 
-	private Long commentId;
-	private String content;
-	private Comment parentCommentId;
+	private Integer talkRoomId;
+	private String name;
 	private LocalDateTime createdAt;
-	private Long userId;
-	private String userName;
-	private String profileImage;
 }

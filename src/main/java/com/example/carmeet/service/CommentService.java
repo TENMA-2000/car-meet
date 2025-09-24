@@ -1,12 +1,14 @@
 package com.example.carmeet.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.carmeet.dto.CommentResponse;
 import com.example.carmeet.entity.Comment;
 import com.example.carmeet.entity.Post;
 import com.example.carmeet.entity.User;
@@ -23,14 +25,44 @@ public class CommentService {
 
 	private final CommentRepository commentRepository;
 	
-	public List<Comment> getRootCommentsPost(Post post, Sort sort){
-		log.info("投稿ID={} のルートコメント一覧を所得します。 並び順={}", post.getPostId(), sort);
-		return commentRepository.findByPostAndParentCommentIdIsNull(post, sort);
+	public List<CommentResponse> getRootCommentsPost(Long postId, Sort sort){
+		log.info("投稿ID={} のルートコメント一覧を所得します。 並び順={}", postId, sort);
+		
+		List<Comment> comments = commentRepository.findByPost_PostIdAndParentCommentIdIsNull(postId, sort);
+		
+		List<CommentResponse> responses = new ArrayList<>();
+		for (Comment comment : comments) {
+			CommentResponse commentResponse = new CommentResponse();
+			commentResponse.setCommentId(comment.getCommentId());
+			commentResponse.setContent(comment.getContent());
+			commentResponse.setParentCommentId(comment.getParentCommentId());
+			commentResponse.setCreatedAt(comment.getCreatedAt());
+			commentResponse.setUserId(comment.getUser().getUserId());
+			commentResponse.setUserName(comment.getUser().getName());
+			commentResponse.setProfileImage(comment.getUser().getProfileImage());
+			
+			responses.add(commentResponse);
+		}
+		
+		return responses;
 	}
 	
-	public List<Comment> getRepliesByParent(Comment parentCommnetId, Sort sort){
+	public List<CommentResponse> getRepliesByParent(Comment parentCommnetId, Sort sort){
 		log.debug("親コメントID={} の返信一覧を取得します。 並び順={}", parentCommnetId.getCommentId());
-		return commentRepository.findByParentCommentId(parentCommnetId, sort);
+		
+		List<Comment> replies = commentRepository.findByParentCommentId(parentCommnetId, sort);
+		List<CommentResponse> responses = new ArrayList<>();
+		
+		for (Comment comment : replies) {
+			CommentResponse commentResponse = new CommentResponse();
+			commentResponse.setCommentId(comment.getCommentId());
+			commentResponse.setContent(comment.getContent());
+			commentResponse.setCreatedAt(comment.getCreatedAt());
+			commentResponse.setUserId(comment.getUser().getUserId());
+			commentResponse.setUserName(comment.getUser().getName());
+			responses.add(commentResponse);
+		}
+		return responses;
 	}
 	
 	public Comment addComment(Post post, User user, String content, Comment parentCommentId) {

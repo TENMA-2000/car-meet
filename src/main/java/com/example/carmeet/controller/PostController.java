@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.carmeet.dto.CommentResponse;
 import com.example.carmeet.dto.PostRequestDTO;
 import com.example.carmeet.dto.PostResponseDTO;
 import com.example.carmeet.entity.Comment;
@@ -46,7 +47,13 @@ public class PostController {
 	public ResponseEntity<PostResponseDTO> getPost(@PathVariable Long postId,
 			@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
 		User user = userDetailsImpl.getUser();
+		
+		log.debug("【投稿取得】postId={} の投稿取得APIが呼ばれました（ユーザーID={}）", postId, user.getUserId());
+		
 		PostResponseDTO postResponseDTO = postService.getPost(postId, user);
+		
+		log.debug("【投稿取得成功】postId={} の投稿データを返却しました", postId);
+		
 		return ResponseEntity.ok(postResponseDTO);
 	}
 
@@ -63,7 +70,13 @@ public class PostController {
 			@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
 
 		User user = userDetailsImpl.getUser();
+		
+		log.debug("【投稿作成】ユーザーID={} が新規投稿を作成します。内容={}", user.getUserId(), postRequestDTO);
+		
 		PostResponseDTO postResponseDTO = postService.createPost(postRequestDTO, multipartFile, user);
+		
+		log.debug("【投稿作成成功】postId={} の投稿を作成しました", postResponseDTO.getPostId());
+		
 		return ResponseEntity.status(HttpStatus.CREATED).body(postResponseDTO);
 	}
 
@@ -73,7 +86,12 @@ public class PostController {
 			@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
 
 		User user = userDetailsImpl.getUser();
+		
+		log.debug("【投稿更新】postId={} の投稿をユーザーID={} が更新します", postId, user.getUserId());
+		
 		PostResponseDTO postResponseDTO = postService.updatePost(postId, postRequestDTO, user);
+		
+		log.debug("【投稿更新成功】postId={} の投稿を更新しました", postId);
 
 		return ResponseEntity.ok(postResponseDTO);
 	}
@@ -82,7 +100,13 @@ public class PostController {
 	public ResponseEntity<Void> deletePost(@PathVariable Long postId,
 			@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
 		User user = userDetailsImpl.getUser();
+		
+		log.debug("【投稿削除】postId={} の投稿をユーザーID={} が削除します", postId, user.getUserId());
+		
 		postService.deletePost(postId, user);
+		
+		log.debug("【投稿削除成功】postId={} の投稿を削除しました", postId);
+		
 		return ResponseEntity.noContent().build();
 	}
 
@@ -104,19 +128,22 @@ public class PostController {
 	}
 	
 	@GetMapping("/{postId}/comments")
-	public List<Comment> getRootComments(@PathVariable Long postId, @RequestParam(defaultValue = "desc") String order) {
-		Post post = new Post();
-		post.setPostId(postId);
+	public List<CommentResponse> getRootComments(@PathVariable Long postId, @RequestParam(defaultValue = "desc") String order) {
+		
+		log.debug("★★ コメント一覧APIが呼ばれました！ postId={}, order={}", postId, order);
 		
 		Sort sort = order.equalsIgnoreCase("asc") ?
 				Sort.by("createdAt").ascending() :
 				Sort.by("createdAt").descending();
 		
-		return commentService.getRootCommentsPost(post, sort);
+		return commentService.getRootCommentsPost(postId, sort);
 	}
 	
-	@GetMapping("/{postId}/comments/{commentId}/reqlies")
-	public List<Comment> getReplies(@PathVariable Long commentId, @RequestParam(defaultValue = "asc") String order) {
+	@GetMapping("/{postId}/comments/{commentId}/replies")
+	public List<CommentResponse> getReplies(@PathVariable Long postId, @PathVariable Long commentId, @RequestParam(defaultValue = "asc") String order) {
+		
+		log.debug("★★ 返信一覧APIが呼ばれました！ postId={}, commentId={}, order={}", postId, commentId, order);
+		
 		Comment parentCommentId = new Comment();
 		parentCommentId.setCommentId(commentId);
 		
@@ -133,6 +160,8 @@ public class PostController {
 							  @RequestParam String content,
 							  @RequestParam(required = false) Long parentCommentId) {
 		
+		log.debug("【コメント追加】postId={} にコメントを追加します。ユーザーID={} 内容={}", postId, userId, content);
+		
 		Post post = new Post();
 		post.setPostId(postId);
 		
@@ -145,7 +174,11 @@ public class PostController {
 			parentComment.setCommentId(parentCommentId);
 		}
 		
-		return commentService.addComment(post, user, content, parentComment);
+		Comment result = commentService.addComment(post, user, content, parentComment);
+		
+		log.debug("【コメント追加成功】commentId={} のコメントを追加しました", result.getCommentId());
+		
+		return result;
 	}
 	
 	@DeleteMapping("/{postId}/comments/{commentId}")

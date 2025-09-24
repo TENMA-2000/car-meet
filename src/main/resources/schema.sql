@@ -62,3 +62,38 @@ CREATE TABLE IF NOT EXISTS comments (
 	FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
 	FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS talk_rooms (
+    talk_room_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    owner_user_id INT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME NULL,
+    FOREIGN KEY (owner_user_id) REFERENCES users(user_id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS talk_room_participants (
+    participant_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    talk_room_id INT NOT NULL,
+    user_id INT NOT NULL,
+    joined_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    left_at DATETIME NULL,
+    UNIQUE KEY (talk_room_id, user_id),
+	FOREIGN KEY (talk_room_id) REFERENCES talk_rooms(talk_room_id) ON DELETE CASCADE,
+	FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS talk_room_messages (
+    message_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    talk_room_id INT NOT NULL,
+    sender_user_id INT NOT NULL,
+    content TEXT NOT NULL,
+    sent_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    attachment_url VARCHAR(255) NULL,
+    is_deleted_by_sender BOOLEAN NOT NULL DEFAULT FALSE,
+    parent_message_id INT NULL,
+    FOREIGN KEY (talk_room_id) REFERENCES talk_rooms(talk_room_id) ON DELETE CASCADE,
+	FOREIGN KEY (sender_user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+	FOREIGN KEY (parent_message_id) REFERENCES talk_room_messages(message_id) ON DELETE SET NULL
+);
